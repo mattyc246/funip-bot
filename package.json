@@ -1,0 +1,19 @@
+{
+  "name": "funip-bot",
+  "version": "1.0.0",
+  "description": "Discord Ice Your Fu Bot",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.3.4",
+    "discord.js": "^14.7.1",
+    "dotenv": "^16.0.3"
+  },
+  "scripts": {
+    "start": "nodemon index.js",
+    "deploy": "node deploy-commands.js"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}
