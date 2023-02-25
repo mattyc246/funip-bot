@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, parseEmoji } = require('discord.js');
+const { SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -29,7 +29,7 @@ module.exports = {
     }
 
     const calculatedEHP = Math.floor(
-      parsedHp / (1 - 0.85 * (1 - 2.718 ** ((-2 * parsedDef) / 3000)))
+      parsedHp / (1 - 0.85 * (1 - Math.E ** ((-2 * parsedDef) / 3000)))
     );
 
     await interaction.reply(

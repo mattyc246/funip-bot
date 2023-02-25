@@ -1,0 +1,56 @@
+const { SlashCommandBuilder } = require('discord.js');
+
+module.exports = {
+  data: new SlashCommandBuilder()
+    .setName('debuffchance')
+    .setDescription('Calculate % chance to land debuff from ACC & RES')
+    .addStringOption((option) =>
+      option.setName('acc').setDescription('Champions ACC').setRequired(true)
+    )
+    .addStringOption((option) =>
+      option.setName('res').setDescription('Enemy RES').setRequired(true)
+    ),
+  async execute(interaction) {
+    const accuracy = interaction.options.getString('acc');
+    const resistance = interaction.options.getString('res');
+
+    let parsedAcc;
+    let parsedRes;
+
+    try {
+      parsedAcc = parseInt(accuracy);
+      parsedRes = parseInt(resistance);
+
+      if (isNaN(parsedAcc) || isNaN(parsedRes)) {
+        throw new Error('Provided values are not a number!');
+      }
+    } catch (error) {
+      return await interaction.reply(error.message);
+    }
+
+    const baseline = parsedAcc - parsedRes;
+
+    let debuffChance;
+
+    if (baseline > -30) {
+      debuffChance = (
+        (1 -
+          (0.03 +
+            0.27 * Math.E ** (6 * ((parsedRes - parsedAcc) / 100) - 0.3))) *
+        100
+      ).toFixed(2);
+    } else {
+      debuffChance = (
+        (1 -
+          (0.3 +
+            0.67 *
+              (1 - Math.E ** (3 * (0.3 - (parsedRes - parsedAcc) / 100))))) *
+        100
+      ).toFixed(2);
+    }
+
+    await interaction.reply(
+      `**CALCULATED DEBUFF CHANCE**\n---------------------\nYour chance to land the debuff is:\n**${debuffChance}%**`
+    );
+  }
+};
