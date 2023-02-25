@@ -50,7 +50,7 @@ module.exports = {
     }
 
     await interaction.reply(
-      `**CALCULATED DEBUFF CHANCE**\n---------------------\nYour chance to land the debuff is:\n**${debuffChance}%**`
+      `**CALCULATED DEBUFF CHANCE**\n---------------------\n**Champion Accuracy:** ${parsedAcc}\n**Enemy Resistance:** ${parsedRes}\nYour chance to land the debuff is:\n**${debuffChance}%**`
     );
   }
 };

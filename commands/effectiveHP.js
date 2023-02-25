@@ -33,7 +33,7 @@ module.exports = {
     );
 
     await interaction.reply(
-      `**CALCULATED EHP**\n---------------------\nYour effective HP is:\n**${calculatedEHP}**`
+      `**CALCULATED EHP**\n---------------------\n**Champion HP:** ${parsedHp}\n**Champion DEF:** ${parsedDef}\nYour effective HP is:\n**${calculatedEHP}**`
     );
   }
 };
