@@ -1,4 +1,6 @@
+const { default: axios } = require('axios');
 const { SlashCommandBuilder, formatEmoji } = require('discord.js');
+const moment = require('moment');
 
 const getEmojiId = (type) => {
   switch (type) {
@@ -16,10 +18,31 @@ module.exports = {
     .setName('2x')
     .setDescription('Check the next upcoming 2x event!'),
   async execute(interaction) {
-    const shard = formatEmoji(getEmojiId('ancient'));
+    try {
+      const { data } = await axios.get(process.env.GIST_DATA_ENDPOINT);
+      const shard = formatEmoji(getEmojiId(data.twoTimes.shardType));
 
-    await interaction.reply(`
-      **UPCOMING 2x EVENT**\n------------------\n${shard} Ancient shards from 24th February to 27th February\n\nExtra Harima 10x event running along side the 2x
-    `);
+      const startDate = moment(data.twoTimes.startDate).format('Do MMMM YYYY');
+      const endDate = moment(data.twoTimes.endDate).format('Do MMMM YYYY');
+
+      let additionalNotesString;
+
+      if (data.twoTimes.additionalNotes.length > 0) {
+        additionalNotesString = data.twoTimes.additionalNotes
+          .map((note) => `- ${note}\n`)
+          .join('');
+      }
+
+      await interaction.reply(`
+        **UPCOMING 2x EVENT**\n------------------\n${shard} **${data.twoTimes.shardType.toUpperCase()} SHARDS** ${shard}\n\n**From:** ${startDate} \n**Until:** ${endDate}${
+        additionalNotesString
+          ? `\n\n------------------\n**Additional Notes:**\n${additionalNotesString}`
+          : ''
+      }
+      `);
+    } catch (error) {
+      console.log(error);
+      return await interaction.reply(`BOT ERROR!`);
+    }
   }
 };
