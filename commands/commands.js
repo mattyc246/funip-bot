@@ -14,6 +14,10 @@ const commands = [
     description: 'Check the current number of open spots in each clan'
   },
   {
+    name: '/cvc',
+    description: 'Check the upcoming CVC tournament details'
+  },
+  {
     name: '/2x',
     description: 'Check the next upcoming 2x event!'
   },
