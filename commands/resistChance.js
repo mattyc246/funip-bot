@@ -2,13 +2,13 @@ const { SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('debuff')
-    .setDescription('Calculate % chance to land debuff from ACC & RES')
+    .setName('resist')
+    .setDescription('Calculate % chance to resist debuff from ACC & RES')
     .addStringOption((option) =>
-      option.setName('acc').setDescription('Champions ACC').setRequired(true)
+      option.setName('acc').setDescription('Enemy ACC').setRequired(true)
     )
     .addStringOption((option) =>
-      option.setName('res').setDescription('Enemy RES').setRequired(true)
+      option.setName('res').setDescription('Champion RES').setRequired(true)
     ),
   async execute(interaction) {
     const accuracy = interaction.options.getString('acc');
@@ -34,23 +34,19 @@ module.exports = {
 
     if (baseline > -30) {
       debuffChance = (
-        (1 -
-          (0.03 +
-            0.27 * Math.E ** (6 * ((parsedRes - parsedAcc) / 100) - 0.3))) *
+        (0.03 + 0.27 * Math.E ** (6 * ((parsedRes - parsedAcc) / 100) - 0.3)) *
         100
       ).toFixed(2);
     } else {
       debuffChance = (
-        (1 -
-          (0.3 +
-            0.67 *
-              (1 - Math.E ** (3 * (0.3 - (parsedRes - parsedAcc) / 100))))) *
+        (0.3 +
+          0.67 * (1 - Math.E ** (3 * (0.3 - (parsedRes - parsedAcc) / 100)))) *
         100
       ).toFixed(2);
     }
 
     await interaction.reply(
-      `**CALCULATED DEBUFF CHANCE**\n---------------------\n**Champion Accuracy:** ${parsedAcc}\n**Enemy Resistance:** ${parsedRes}\nYour chance to land the debuff is:\n**${debuffChance}%**`
+      `**CALCULATED RESIST CHANCE**\n---------------------\n**Champion Accuracy:** ${parsedAcc}\n**Enemy Resistance:** ${parsedRes}\nChance the enemy will resist your debuff is:\n**${debuffChance}%**`
     );
   }
 };

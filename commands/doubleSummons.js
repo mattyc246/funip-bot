@@ -22,6 +22,12 @@ module.exports = {
       const { data } = await axios.get(process.env.GIST_DATA_ENDPOINT);
       const shard = formatEmoji(getEmojiId(data.twoTimes.shardType));
 
+      if (!data.twoTimes.startDate || !data.twoTimes.endDate) {
+        return await interaction.reply(
+          '**UPCOMING 2x EVENT**\n------------------\n Information not yet known'
+        );
+      }
+
       const startDate = moment(data.twoTimes.startDate).format('Do MMMM YYYY');
       const endDate = moment(data.twoTimes.endDate).format('Do MMMM YYYY');
 

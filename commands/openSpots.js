@@ -5,7 +5,7 @@ const MAX_MEMBERS = 30;
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('openspots')
+    .setName('open')
     .setDescription('Check the current number of open spots in each clan'),
   async execute(interaction) {
     try {
