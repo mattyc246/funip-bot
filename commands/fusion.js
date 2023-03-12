@@ -23,7 +23,7 @@ module.exports = {
 
       const embed = new EmbedBuilder().setImage(imageUrl);
 
-      const message = `**FUSION DETAILS**\n----------------\n**Champion:** ${activeFusion?.champion_name}\n**Affinity:** ${activeFusion?.affinity}\n**Fusion Type:** ${activeFusion?.fusion_type}\n**From:** ${startDate}\n**Until:** ${endDate}`;
+      const message = `**FUSION DETAILS**\n----------------\n**Champion:** ${activeFusion?.champion_name}\n**Affinity:** ${activeFusion?.affinity}\n**Faction:** ${activeFusion?.faction}\n**Fusion Type:** ${activeFusion?.fusion_type}\n**From:** ${startDate}\n**Until:** ${endDate}`;
 
       await interaction.reply(message);
       return await interaction.channel.send({
