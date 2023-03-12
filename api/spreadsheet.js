@@ -10,8 +10,6 @@ const getSpreadsheetUrl = async () => {
     const url = `/api/spreadsheet-url`;
     const response = await apiClient.get(url);
 
-    console.log(response?.data?.data?.attributes);
-
     if (response?.status === HTTP_STATUS_OK) {
       return successResponse({
         data: response?.data?.data?.attributes?.url
