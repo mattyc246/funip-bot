@@ -1,18 +1,16 @@
-// Update spreadsheetUrl in GIST with the spreadsheet URL.
-
-const { default: axios } = require('axios');
 const { SlashCommandBuilder } = require('discord.js');
+const { getSpreadsheetUrl } = require('../api/spreadsheet');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('spreadsheet')
     .setDescription('Get the URL to the clan spreadsheet'),
   async execute(interaction) {
-    try {
-      const { data } = await axios.get(process.env.GIST_DATA_ENDPOINT);
-      await interaction.reply(`Click to view:\n${data.spreadsheetUrl}`);
-    } catch (error) {
-      console.log('ERROR: ', error);
+    const response = await getSpreadsheetUrl();
+
+    if (response?.isSuccess) {
+      await interaction.reply(`Click to view:\n${response?.data}`);
+    } else {
       await interaction.reply('BOT ERROR!');
     }
   }

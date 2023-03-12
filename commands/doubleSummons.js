@@ -1,6 +1,6 @@
-const { default: axios } = require('axios');
 const { SlashCommandBuilder, formatEmoji } = require('discord.js');
 const moment = require('moment');
+const { get2xData } = require('../api/doubleSummons');
 
 const getEmojiId = (type) => {
   switch (type) {
@@ -18,36 +18,34 @@ module.exports = {
     .setName('2x')
     .setDescription('Check the next upcoming 2x event!'),
   async execute(interaction) {
-    try {
-      const { data } = await axios.get(process.env.GIST_DATA_ENDPOINT);
-      const shard = formatEmoji(getEmojiId(data.twoTimes.shardType));
+    const response = await get2xData();
 
-      if (!data.twoTimes.startDate || !data.twoTimes.endDate) {
+    if (response?.isSuccess) {
+      if (response?.data?.length === 0) {
         return await interaction.reply(
           '**UPCOMING 2x EVENT**\n------------------\n Information not yet known'
         );
       }
 
-      const startDate = moment(data.twoTimes.startDate).format('Do MMMM YYYY');
-      const endDate = moment(data.twoTimes.endDate).format('Do MMMM YYYY');
+      const nextEvent = response?.data[0];
 
-      let additionalNotesString;
+      const shard = formatEmoji(getEmojiId(nextEvent?.attributes?.shard_type));
 
-      if (data.twoTimes.additionalNotes.length > 0) {
-        additionalNotesString = data.twoTimes.additionalNotes
-          .map((note) => `- ${note}\n`)
-          .join('');
-      }
+      const startDate = moment(nextEvent?.attributes?.start_date).format(
+        'Do MMMM YYYY'
+      );
+      const endDate = moment(nextEvent?.attributes?.end_date).format(
+        'Do MMMM YYYY'
+      );
 
       await interaction.reply(`
-        **UPCOMING 2x EVENT**\n------------------\n${shard} **${data.twoTimes.shardType.toUpperCase()} SHARDS** ${shard}\n\n**From:** ${startDate} \n**Until:** ${endDate}${
-        additionalNotesString
-          ? `\n\n------------------\n**Additional Notes:**\n${additionalNotesString}`
+        **UPCOMING 2x EVENT**\n------------------\n${shard} **${nextEvent?.attributes?.shard_type?.toUpperCase()} SHARDS** ${shard}\n\n**From:** ${startDate} \n**Until:** ${endDate}${
+        nextEvent?.attributes?.additional_notes
+          ? `\n\n------------------\n**Additional Notes:**\n${nextEvent?.attributes?.additional_notes}`
           : ''
       }
       `);
-    } catch (error) {
-      console.log(error);
+    } else {
       return await interaction.reply(`BOT ERROR!`);
     }
   }

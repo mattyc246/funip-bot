@@ -1,4 +1,4 @@
-const { default: axios } = require('axios');
+const { getCvcData } = require('../api/clanVsClan');
 const { SlashCommandBuilder } = require('discord.js');
 const moment = require('moment');
 
@@ -7,25 +7,34 @@ module.exports = {
     .setName('cvc')
     .setDescription('Check the upcoming CVC tournament details'),
   async execute(interaction) {
-    try {
-      const { data } = await axios.get(process.env.GIST_DATA_ENDPOINT);
+    const response = await getCvcData();
 
-      if (!data.cvc.startDate || !data.cvc.endDate) {
+    if (response?.isSuccess) {
+      if (response?.data?.length === 0) {
         return await interaction.reply(
           '**UPCOMING CVC**\n----------------\nCvC details not yet available'
         );
       }
 
-      const startDate = moment(data.cvc.startDate).format('Do MMMM YYYY');
-      const endDate = moment(data.cvc.endDate).format('Do MMMM YYYY');
+      const nextCvc = response?.data[0];
+
+      const startDate = moment(nextCvc?.attributes?.start_date).format(
+        'Do MMMM YYYY'
+      );
+      const endDate = moment(nextCvc?.attributes?.end_date).format(
+        'Do MMMM YYYY'
+      );
 
       await interaction.reply(
         `**UPCOMING CVC**\n----------------\n**From:** ${startDate}\n**Until** ${endDate}\n----------------\nThis CvC **${
-          data.cvc.personalRewards ? 'WILL' : 'WILL NOT'
-        }** feature Personal Rewards!`
+          nextCvc?.attributes?.personal_rewards ? 'WILL' : 'WILL NOT'
+        }** feature Personal Rewards!${
+          nextCvc?.attributes?.additional_notes
+            ? `\n----------------\n${nextCvc?.attributes?.additional_notes}`
+            : ''
+        }`
       );
-    } catch (error) {
-      console.log('ERROR: ', error);
+    } else {
       await interaction.reply('BOT ERROR!');
     }
   }
