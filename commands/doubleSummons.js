@@ -1,4 +1,3 @@
-const { default: axios } = require('axios');
 const { SlashCommandBuilder, formatEmoji } = require('discord.js');
 const moment = require('moment');
 const { get2xData } = require('../api/doubleSummons');
