@@ -36,6 +36,10 @@ const commands = [
   {
     name: '/debuff',
     description: 'Calculate % chance to land debuff from ACC & RES'
+  },
+  {
+    name: '/fusion',
+    description: 'Shows the current fusion details and fusion planner'
   }
 ];
 
