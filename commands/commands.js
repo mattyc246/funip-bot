@@ -48,15 +48,23 @@ module.exports = {
     .setName('commands')
     .setDescription('List out all commands'),
   async execute(interaction) {
-    const textString = codeBlock(
-      'COMMANDS\n' +
-        commands
-          .map(
-            (command) =>
-              `=====================\n${command.name}\n${command.description}\n\n`
-          )
-          .join('')
-    );
-    await interaction.reply(textString);
+    const fields = commands?.map((command) => {
+      return {
+        name: command.name,
+        value: command.description
+      };
+    });
+
+    const embedObject = {
+      color: 0xffffff,
+      title: 'Bot Commands',
+      description: 'List of available bot commands for FuNip bot.',
+      fields: fields
+    };
+
+    await interaction.reply({ content: 'Thanks nerd!', ephemeral: true });
+    await interaction.channel.send({
+      embeds: [embedObject]
+    });
   }
 };

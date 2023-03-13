@@ -15,20 +15,30 @@ module.exports = {
         return await interaction.reply('No clan data found!');
       }
 
-      let clanString = '';
+      const embeds = response?.data?.map((clan) => {
+        const isClanFull = clan?.attributes?.total_members === MAX_MEMBERS;
 
-      response?.data?.forEach((clan) => {
-        const openSpaces = MAX_MEMBERS - clan?.attributes?.total_members;
-        clanString += `**${clan?.attributes?.name}**: \n${
-          clan?.attributes?.total_members
-        }/${MAX_MEMBERS} Members \nStatus: ${
-          clan?.attributes?.total_members === MAX_MEMBERS
-            ? '**CLAN FULL**'
-            : `**${openSpaces} OPEN SPACE${openSpaces === 1 ? '' : 'S'}**`
-        }\n\n`;
+        return {
+          title: clan?.attributes?.name,
+          color: isClanFull ? 0xe61c47 : 0x32a852,
+          fields: [
+            {
+              name: 'Members',
+              value: `${clan?.attributes?.total_members} / ${MAX_MEMBERS}`,
+              inline: true
+            },
+            {
+              name: 'Status',
+              value: isClanFull ? 'FULL' : 'AVAILABLE'
+            }
+          ]
+        };
       });
 
-      await interaction.reply(clanString);
+      await interaction.reply({ content: 'Thanks nerd!', ephemeral: true });
+      return await interaction.channel.send({
+        embeds: embeds
+      });
     } else {
       return await interaction.reply('BOT ERROR!');
     }
