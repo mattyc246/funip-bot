@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, codeBlock } = require('discord.js');
+const { SlashCommandBuilder } = require('discord.js');
 
 const commands = [
   {
@@ -40,6 +40,18 @@ const commands = [
   {
     name: '/fusion',
     description: 'Shows the current fusion details and fusion planner'
+  },
+  {
+    name: '/totw',
+    description: 'Upload your team of the week'
+  },
+  {
+    name: '/add_optimizer',
+    description: 'Create your optimizer profile'
+  },
+  {
+    name: '/get_optimizer',
+    description: 'Search for a users optimizer profile'
   }
 ];
 
