@@ -10,27 +10,25 @@ export async function execute(interaction) {
   const response = await getCvcData();
 
   if (response?.isSuccess) {
-    if (response?.data?.length === 0) {
+    if (response?.cvcs?.length === 0) {
       return await interaction.reply(
         '**UPCOMING CVC**\n----------------\nCvC details not yet available'
       );
     }
 
-    const nextCvc = response?.data[0];
+    const nextCvc = response?.cvcs[0];
 
-    const startDate = moment(nextCvc?.attributes?.start_date).format(
+    const startDate = moment(nextCvc?.startDate?.toDate()).format(
       'Do MMMM YYYY'
     );
-    const endDate = moment(nextCvc?.attributes?.end_date).format(
-      'Do MMMM YYYY'
-    );
+    const endDate = moment(nextCvc?.endDate?.toDate()).format('Do MMMM YYYY');
 
     await interaction.reply(
       `**UPCOMING CVC**\n----------------\n**From:** ${startDate}\n**Until** ${endDate}\n----------------\nThis CvC **${
-        nextCvc?.attributes?.personal_rewards ? 'WILL' : 'WILL NOT'
+        nextCvc?.personalRewards ? 'WILL' : 'WILL NOT'
       }** feature Personal Rewards!${
-        nextCvc?.attributes?.additional_notes
-          ? `\n----------------\n${nextCvc?.attributes?.additional_notes}`
+        nextCvc?.additionalNotes
+          ? `\n----------------\n${nextCvc?.additionalNotes}`
           : ''
       }`
     );
