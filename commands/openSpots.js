@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from 'discord.js';
-import { getClanData } from '../api/openSpots.js';
+import { fetchClans } from '../api/openSpots.js';
 
 const MAX_MEMBERS = 30;
 
@@ -8,23 +8,23 @@ export const data = new SlashCommandBuilder()
   .setDescription('Check the current number of open spots in each clan');
 
 export async function execute(interaction) {
-  const response = await getClanData();
+  const response = await fetchClans();
 
   if (response?.isSuccess) {
-    if (response?.data?.length === 0) {
+    if (response?.clans?.length === 0) {
       return await interaction.reply('No clan data found!');
     }
 
-    const embeds = response?.data?.map((clan) => {
-      const isClanFull = clan?.attributes?.total_members === MAX_MEMBERS;
+    const embeds = response?.clans?.map((clan) => {
+      const isClanFull = clan?.totalMembers === MAX_MEMBERS;
 
       return {
-        title: clan?.attributes?.name,
+        title: clan?.name,
         color: isClanFull ? 0xe61c47 : 0x32a852,
         fields: [
           {
             name: 'Members',
-            value: `${clan?.attributes?.total_members} / ${MAX_MEMBERS}`,
+            value: `${clan?.totalMembers} / ${MAX_MEMBERS}`,
             inline: true
           },
           {
