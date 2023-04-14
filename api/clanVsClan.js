@@ -13,7 +13,9 @@ import {
 const getCvcData = async () => {
   const q = query(
     collection(db, 'clan-vs-clans'),
-    where('endDate', '>=', Timestamp.now(), orderBy('createdAt'), limit(1))
+    where('endDate', '>=', Timestamp.now()),
+    orderBy('endDate'),
+    limit(1)
   );
 
   try {

@@ -21,27 +21,25 @@ export async function execute(interaction) {
   const response = await get2xData();
 
   if (response?.isSuccess) {
-    if (response?.data?.length === 0) {
+    if (response?.events?.length === 0) {
       return await interaction.reply(
         '**UPCOMING 2x EVENT**\n------------------\n Information not yet known'
       );
     }
 
-    const nextEvent = response?.data[0];
+    const nextEvent = response?.events[0];
 
-    const shard = formatEmoji(getEmojiId(nextEvent?.attributes?.shard_type));
+    const shard = formatEmoji(getEmojiId(nextEvent?.shardType));
 
-    const startDate = moment(nextEvent?.attributes?.start_date).format(
+    const startDate = moment(nextEvent?.startDate?.toDate()).format(
       'Do MMMM YYYY'
     );
-    const endDate = moment(nextEvent?.attributes?.end_date).format(
-      'Do MMMM YYYY'
-    );
+    const endDate = moment(nextEvent?.endDate?.toDate()).format('Do MMMM YYYY');
 
     await interaction.reply(`
-        **UPCOMING 2x EVENT**\n------------------\n${shard} **${nextEvent?.attributes?.shard_type?.toUpperCase()} SHARDS** ${shard}\n\n**From:** ${startDate} \n**Until:** ${endDate}${
-      nextEvent?.attributes?.additional_notes
-        ? `\n\n------------------\n**Additional Notes:**\n${nextEvent?.attributes?.additional_notes}`
+        **UPCOMING 2x EVENT**\n------------------\n${shard} **${nextEvent?.shardType?.toUpperCase()} SHARDS** ${shard}\n\n**From:** ${startDate} \n**Until:** ${endDate}${
+      nextEvent?.additionalNotes
+        ? `\n\n------------------\n**Additional Notes:**\n${nextEvent?.additionalNotes}`
         : ''
     }
       `);
