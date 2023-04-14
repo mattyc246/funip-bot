@@ -1,6 +1,6 @@
-const { default: axios } = require('axios');
-const { SlashCommandBuilder } = require('discord.js');
-const { createTotwEntry, uploadImage } = require('../api/teamOfTheWeek');
+import axios from 'axios';
+import { SlashCommandBuilder } from 'discord.js';
+import { createTotwEntry, uploadImage } from '../api/teamOfTheWeek.js';
 
 function b64toBlob(dataURI) {
   var byteString = atob(dataURI.split(',')[1]);
@@ -27,112 +27,111 @@ function dungeonChoiceToString(choice) {
   return choices[choice] ?? '';
 }
 
-module.exports = {
-  data: new SlashCommandBuilder()
-    .setName('totw')
-    .setDescription('Upload your team of the week')
-    .addAttachmentOption((option) =>
-      option
-        .setName('image')
-        .setDescription('Screenshot of your dungeon/boss run')
-        .setRequired(true)
-    )
-    .addStringOption((option) =>
-      option
-        .setName('dungeon')
-        .setDescription('Select the dungeon')
-        .addChoices(
-          { name: 'Demon Lord', value: 'demon_lord' },
-          { name: 'Hydra', value: 'Hydra' },
-          { name: 'Iron Twins', value: 'iron_twins' },
-          { name: 'Sand Devils Necropolis', value: 'sand_devils_necropolis' },
-          { name: 'Spider', value: 'spider' },
-          { name: 'Dragon', value: 'dragon' },
-          { name: 'Fire Knight', value: 'fire_knight' },
-          { name: 'Ice Golem', value: 'ice_golem' }
-        )
-        .setRequired(true)
-    ),
-  async execute(interaction) {
-    const image = interaction.options.getAttachment('image');
-    const dungeon = interaction.options.getString('dungeon');
+export const data = new SlashCommandBuilder()
+  .setName('totw')
+  .setDescription('Upload your team of the week')
+  .addAttachmentOption((option) =>
+    option
+      .setName('image')
+      .setDescription('Screenshot of your dungeon/boss run')
+      .setRequired(true)
+  )
+  .addStringOption((option) =>
+    option
+      .setName('dungeon')
+      .setDescription('Select the dungeon')
+      .addChoices(
+        { name: 'Demon Lord', value: 'demon_lord' },
+        { name: 'Hydra', value: 'Hydra' },
+        { name: 'Iron Twins', value: 'iron_twins' },
+        { name: 'Sand Devils Necropolis', value: 'sand_devils_necropolis' },
+        { name: 'Spider', value: 'spider' },
+        { name: 'Dragon', value: 'dragon' },
+        { name: 'Fire Knight', value: 'fire_knight' },
+        { name: 'Ice Golem', value: 'ice_golem' }
+      )
+      .setRequired(true)
+  );
 
-    if (!image) {
-      return await interaction.reply({
-        content: 'No image provided, please provide an image to upload.',
-        ephemeral: true
-      });
-    }
+export async function execute(interaction) {
+  const image = interaction.options.getAttachment('image');
+  const dungeon = interaction.options.getString('dungeon');
 
-    if (!image.contentType.includes('image')) {
-      return await interaction.reply({
-        content: 'Attachment must be an image!',
-        ephemeral: true
-      });
-    }
+  if (!image) {
+    return await interaction.reply({
+      content: 'No image provided, please provide an image to upload.',
+      ephemeral: true
+    });
+  }
 
-    await interaction.deferReply({ ephemeral: true });
+  if (!image.contentType.includes('image')) {
+    return await interaction.reply({
+      content: 'Attachment must be an image!',
+      ephemeral: true
+    });
+  }
 
-    try {
-      const imageRes = await axios.get(image.url, {
-        responseType: 'arraybuffer'
-      });
+  await interaction.deferReply({ ephemeral: true });
 
-      const dataUrl = `data:${image.contentType};base64,${Buffer.from(
-        imageRes.data,
-        'binary'
-      ).toString('base64')}`;
+  try {
+    const imageRes = await axios.get(image.url, {
+      responseType: 'arraybuffer'
+    });
 
-      const blob = b64toBlob(dataUrl);
+    const dataUrl = `data:${image.contentType};base64,${Buffer.from(
+      imageRes.data,
+      'binary'
+    ).toString('base64')}`;
 
-      const formData = new FormData();
-      formData.append('files', blob, image.name);
+    const blob = b64toBlob(dataUrl);
 
-      const uploadRes = await uploadImage(formData);
+    const formData = new FormData();
+    formData.append('files', blob, image.name);
 
-      const data = {
-        data: {
-          dungeon,
-          screenshot: uploadRes?.image?.id,
-          user: interaction?.user?.username
+    const uploadRes = await uploadImage(formData);
+
+    const data = {
+      data: {
+        dungeon,
+        screenshot: uploadRes?.image?.id,
+        user: interaction?.user?.username
+      }
+    };
+
+    const res = await createTotwEntry(data);
+
+    if (res?.isSuccess) {
+      await interaction.editReply('Successfully submitted for TOTW!');
+      const embedObject = {
+        color: 0xfcba03,
+        title: 'TOTW Submission',
+        description: 'Submission accepted to TOTW!',
+        fields: [
+          {
+            name: `User`,
+            value: interaction?.user?.username,
+            inline: true
+          },
+          {
+            name: `Dungeon`,
+            value: dungeonChoiceToString(dungeon),
+            inline: true
+          }
+        ],
+        image: {
+          url: uploadRes?.image?.url
         }
       };
-
-      const res = await createTotwEntry(data);
-
-      if (res?.isSuccess) {
-        await interaction.editReply('Successfully submitted for TOTW!');
-        const embedObject = {
-          color: 0xfcba03,
-          title: 'TOTW Submission',
-          description: 'Submission accepted to TOTW!',
-          fields: [
-            {
-              name: `User`,
-              value: interaction?.user?.username,
-              inline: true
-            },
-            {
-              name: `Dungeon`,
-              value: dungeonChoiceToString(dungeon),
-              inline: true
-            }
-          ],
-          image: {
-            url: uploadRes?.image?.url
-          }
-        };
-        return await interaction.channel.send({
-          embeds: [embedObject]
-        });
-      } else {
-        return await interaction.editReply(
-          'Submission was not received, please try again!'
-        );
-      }
-    } catch (error) {
-      console.log('Error: ', error);
-      return await interaction.editReply('BOT ERROR!');
+      return await interaction.channel.send({
+        embeds: [embedObject]
+      });
+    } else {
+      return await interaction.editReply(
+        'Submission was not received, please try again!'
+      );
     }
+  } catch (error) {
+    console.log('Error: ', error);
+    return await interaction.editReply('BOT ERROR!');
   }
-};
+}

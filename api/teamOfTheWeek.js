@@ -1,9 +1,9 @@
-const {
+import {
   failedResponse,
   apiClient,
   HTTP_STATUS_OK,
   successResponse
-} = require('./axios');
+} from './axios.js';
 
 const uploadImage = async (data) => {
   if (!data) return failedResponse();
@@ -41,4 +41,4 @@ const createTotwEntry = async (data) => {
   }
 };
 
-module.exports = { createTotwEntry, uploadImage };
+export { createTotwEntry, uploadImage };

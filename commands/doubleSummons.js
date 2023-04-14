@@ -1,6 +1,6 @@
-const { SlashCommandBuilder, formatEmoji } = require('discord.js');
-const moment = require('moment');
-const { get2xData } = require('../api/doubleSummons');
+import { SlashCommandBuilder, formatEmoji } from 'discord.js';
+import moment from 'moment';
+import { get2xData } from '../api/doubleSummons.js';
 
 const getEmojiId = (type) => {
   switch (type) {
@@ -13,40 +13,39 @@ const getEmojiId = (type) => {
   }
 };
 
-module.exports = {
-  data: new SlashCommandBuilder()
-    .setName('2x')
-    .setDescription('Check the next upcoming 2x event!'),
-  async execute(interaction) {
-    const response = await get2xData();
+export const data = new SlashCommandBuilder()
+  .setName('2x')
+  .setDescription('Check the next upcoming 2x event!');
 
-    if (response?.isSuccess) {
-      if (response?.data?.length === 0) {
-        return await interaction.reply(
-          '**UPCOMING 2x EVENT**\n------------------\n Information not yet known'
-        );
-      }
+export async function execute(interaction) {
+  const response = await get2xData();
 
-      const nextEvent = response?.data[0];
-
-      const shard = formatEmoji(getEmojiId(nextEvent?.attributes?.shard_type));
-
-      const startDate = moment(nextEvent?.attributes?.start_date).format(
-        'Do MMMM YYYY'
+  if (response?.isSuccess) {
+    if (response?.data?.length === 0) {
+      return await interaction.reply(
+        '**UPCOMING 2x EVENT**\n------------------\n Information not yet known'
       );
-      const endDate = moment(nextEvent?.attributes?.end_date).format(
-        'Do MMMM YYYY'
-      );
-
-      await interaction.reply(`
-        **UPCOMING 2x EVENT**\n------------------\n${shard} **${nextEvent?.attributes?.shard_type?.toUpperCase()} SHARDS** ${shard}\n\n**From:** ${startDate} \n**Until:** ${endDate}${
-        nextEvent?.attributes?.additional_notes
-          ? `\n\n------------------\n**Additional Notes:**\n${nextEvent?.attributes?.additional_notes}`
-          : ''
-      }
-      `);
-    } else {
-      return await interaction.reply(`BOT ERROR!`);
     }
+
+    const nextEvent = response?.data[0];
+
+    const shard = formatEmoji(getEmojiId(nextEvent?.attributes?.shard_type));
+
+    const startDate = moment(nextEvent?.attributes?.start_date).format(
+      'Do MMMM YYYY'
+    );
+    const endDate = moment(nextEvent?.attributes?.end_date).format(
+      'Do MMMM YYYY'
+    );
+
+    await interaction.reply(`
+        **UPCOMING 2x EVENT**\n------------------\n${shard} **${nextEvent?.attributes?.shard_type?.toUpperCase()} SHARDS** ${shard}\n\n**From:** ${startDate} \n**Until:** ${endDate}${
+      nextEvent?.attributes?.additional_notes
+        ? `\n\n------------------\n**Additional Notes:**\n${nextEvent?.attributes?.additional_notes}`
+        : ''
+    }
+      `);
+  } else {
+    return await interaction.reply(`BOT ERROR!`);
   }
-};
+}

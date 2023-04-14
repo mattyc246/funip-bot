@@ -1,4 +1,4 @@
-const axios = require('axios');
+import axios from 'axios';
 
 const HTTP_STATUS_OK = 200;
 
@@ -24,4 +24,4 @@ const apiClient = axios.create({
   }
 });
 
-module.exports = { HTTP_STATUS_OK, apiClient, failedResponse, successResponse };
+export { HTTP_STATUS_OK, apiClient, failedResponse, successResponse };

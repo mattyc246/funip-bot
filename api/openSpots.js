@@ -1,9 +1,9 @@
-const {
+import {
   failedResponse,
   apiClient,
   HTTP_STATUS_OK,
   successResponse
-} = require('./axios');
+} from './axios.js';
 
 const getClanData = async () => {
   try {
@@ -23,4 +23,4 @@ const getClanData = async () => {
   }
 };
 
-module.exports = { getClanData };
+export { getClanData };

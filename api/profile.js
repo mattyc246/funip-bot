@@ -1,9 +1,9 @@
-const {
+import {
   failedResponse,
   apiClient,
   HTTP_STATUS_OK,
   successResponse
-} = require('./axios');
+} from './axios.js';
 
 const createProfile = async (data) => {
   if (!data) return failedResponse();
@@ -40,4 +40,4 @@ const getProfiles = async () => {
   }
 };
 
-module.exports = { createProfile, getProfiles };
+export { createProfile, getProfiles };

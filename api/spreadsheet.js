@@ -1,9 +1,9 @@
-const {
-  apiClient,
+import {
   failedResponse,
+  apiClient,
   HTTP_STATUS_OK,
   successResponse
-} = require('./axios');
+} from './axios.js';
 
 const getSpreadsheetUrl = async () => {
   try {
@@ -23,4 +23,4 @@ const getSpreadsheetUrl = async () => {
   }
 };
 
-module.exports = { getSpreadsheetUrl };
+export { getSpreadsheetUrl };

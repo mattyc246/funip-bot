@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+import { SlashCommandBuilder } from 'discord.js';
 
 const commands = [
   {
@@ -55,28 +55,27 @@ const commands = [
   }
 ];
 
-module.exports = {
-  data: new SlashCommandBuilder()
-    .setName('commands')
-    .setDescription('List out all commands'),
-  async execute(interaction) {
-    const fields = commands?.map((command) => {
-      return {
-        name: command.name,
-        value: command.description
-      };
-    });
+export const data = new SlashCommandBuilder()
+  .setName('commands')
+  .setDescription('List out all commands');
 
-    const embedObject = {
-      color: 0xffffff,
-      title: 'Bot Commands',
-      description: 'List of available bot commands for FuNip bot.',
-      fields: fields
+export async function execute(interaction) {
+  const fields = commands?.map((command) => {
+    return {
+      name: command.name,
+      value: command.description
     };
+  });
 
-    await interaction.reply({ content: 'Thanks nerd!', ephemeral: true });
-    await interaction.channel.send({
-      embeds: [embedObject]
-    });
-  }
-};
+  const embedObject = {
+    color: 0xffffff,
+    title: 'Bot Commands',
+    description: 'List of available bot commands for FuNip bot.',
+    fields: fields
+  };
+
+  await interaction.reply({ content: 'Thanks nerd!', ephemeral: true });
+  await interaction.channel.send({
+    embeds: [embedObject]
+  });
+}

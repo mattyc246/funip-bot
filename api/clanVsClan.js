@@ -1,12 +1,12 @@
-const {
+import {
   failedResponse,
   apiClient,
   HTTP_STATUS_OK,
   successResponse
-} = require('./axios');
+} from './axios.js';
 
-const qs = require('qs');
-const moment = require('moment');
+import qs from 'qs';
+import moment from 'moment';
 
 const getCvcData = async () => {
   const query = qs.stringify(
@@ -38,4 +38,4 @@ const getCvcData = async () => {
   }
 };
 
-module.exports = { getCvcData };
+export { getCvcData };
