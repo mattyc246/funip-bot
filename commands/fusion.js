@@ -1,84 +1,100 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { getFusionData } = require('../api/fusion');
-const moment = require('moment');
+import { SlashCommandBuilder } from 'discord.js';
+import { getFusionData } from '../api/fusion.js';
+import moment from 'moment';
 
 const getAffinityColor = (affinity) => {
   switch (affinity) {
-    case 'Void':
+    case 'void':
       return 0xcb3dc9;
-    case 'Spirit':
+    case 'spirit':
       return 0x52c548;
-    case 'Force':
+    case 'force':
       return 0xe54b3c;
-    case 'Magic':
+    case 'magic':
       return 0x59c0f9;
     default:
       return 0x000000;
   }
 };
 
-module.exports = {
-  data: new SlashCommandBuilder()
-    .setName('fusion')
-    .setDescription('Shows the current fusion details and fusion planner'),
-  async execute(interaction) {
-    const response = await getFusionData();
-
-    if (response?.isSuccess) {
-      if (response?.data?.length === 0) {
-        return await interaction.reply('No current upcoming fusions.');
-      }
-
-      const activeFusion = response?.data[0]?.attributes;
-
-      const imageUrl = activeFusion?.fusion_planner?.data?.attributes?.url;
-
-      const startDate = moment(activeFusion?.start_date).format('Do MMMM YYYY');
-      const endDate = moment(activeFusion?.end_date).format('Do MMMM YYYY');
-
-      const embedObject = {
-        color: getAffinityColor(activeFusion?.affinity),
-        title: activeFusion?.champion_name,
-        description: 'Current Raid Shadow Legends Champion Fusion',
-        fields: [
-          {
-            name: `Start Date`,
-            value: startDate,
-            inline: true
-          },
-          {
-            name: `End Date`,
-            value: endDate,
-            inline: true
-          },
-          {
-            name: `Fusion Type`,
-            value: activeFusion?.fusion_type
-          },
-          {
-            name: 'Faction',
-            value: activeFusion?.faction,
-            inline: true
-          },
-          {
-            name: `Affinity`,
-            value: activeFusion?.affinity,
-            inline: true
-          }
-        ],
-        image: {
-          url: imageUrl
-        }
-      };
-
-      const message = 'Thanks nerd!';
-
-      await interaction.reply({ content: message, ephemeral: true });
-      return await interaction.channel.send({
-        embeds: [embedObject]
-      });
-    } else {
-      return await interaction.reply('BOT ERROR!');
-    }
+const getFusionType = (type) => {
+  switch (type) {
+    case 'fragment':
+      return 'Fragment Collector';
+    case 'fragment_fusion':
+      return 'Fragment Fusion';
+    default:
+      return 'Classic';
   }
 };
+
+export const data = new SlashCommandBuilder()
+  .setName('fusion')
+  .setDescription('Shows the current fusion details and fusion planner');
+
+export async function execute(interaction) {
+  const response = await getFusionData();
+
+  if (response?.isSuccess) {
+    if (response?.fusions?.length === 0) {
+      return await interaction.reply('No current upcoming fusions.');
+    }
+
+    const activeFusion = response?.fusions[0];
+
+    const imageUrl = activeFusion?.fusionPlanner;
+
+    const startDate = moment(activeFusion?.startDate?.toDate()).format(
+      'Do MMMM YYYY'
+    );
+    const endDate = moment(activeFusion?.endDate?.toDate()).format(
+      'Do MMMM YYYY'
+    );
+
+    const embedObject = {
+      color: getAffinityColor(activeFusion?.affinity),
+      title: activeFusion?.championName,
+      description: 'Current Raid Shadow Legends Champion Fusion',
+      fields: [
+        {
+          name: `Start Date`,
+          value: startDate,
+          inline: true
+        },
+        {
+          name: `End Date`,
+          value: endDate,
+          inline: true
+        },
+        {
+          name: `Fusion Type`,
+          value: getFusionType(activeFusion?.fusionType)
+        },
+        {
+          name: 'Faction',
+          value: activeFusion?.faction,
+          inline: true
+        },
+        {
+          name: `Affinity`,
+          value:
+            activeFusion?.affinity?.charAt(0).toUpperCase() +
+            activeFusion?.affinity?.slice(1),
+          inline: true
+        }
+      ],
+      image: {
+        url: imageUrl
+      }
+    };
+
+    const message = 'Thanks nerd!';
+
+    await interaction.reply({ content: message, ephemeral: true });
+    return await interaction.channel.send({
+      embeds: [embedObject]
+    });
+  } else {
+    return await interaction.reply('BOT ERROR!');
+  }
+}

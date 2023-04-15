@@ -1,44 +1,24 @@
-const {
-  failedResponse,
-  apiClient,
-  HTTP_STATUS_OK,
-  successResponse
-} = require('./axios');
-
-const uploadImage = async (data) => {
-  if (!data) return failedResponse();
-  try {
-    const url = `/api/upload`;
-    const response = await apiClient.post(url, data);
-
-    if (response?.status === HTTP_STATUS_OK) {
-      return successResponse({
-        image: response?.data?.[0]
-      });
-    } else {
-      return failedResponse();
-    }
-  } catch (error) {
-    return failedResponse();
-  }
-};
+import { Timestamp, collection, doc, setDoc } from 'firebase/firestore';
+import { db } from '../services/firebase.js';
+import { failedResponse, successResponse } from './axios.js';
 
 const createTotwEntry = async (data) => {
   if (!data) return failedResponse();
   try {
-    const url = `/api/totw-submissions`;
-    const response = await apiClient.post(url, data);
+    const docRef = doc(collection(db, 'team-of-the-week'));
 
-    if (response?.status === HTTP_STATUS_OK) {
-      return successResponse({
-        data: response?.data
-      });
-    } else {
-      return failedResponse();
-    }
+    await setDoc(docRef, {
+      id: docRef.id,
+      ...data,
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now()
+    });
+
+    return successResponse();
   } catch (error) {
+    console.log(error);
     return failedResponse();
   }
 };
 
-module.exports = { createTotwEntry, uploadImage };
+export { createTotwEntry };

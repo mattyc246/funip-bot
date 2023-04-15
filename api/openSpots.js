@@ -1,26 +1,23 @@
-const {
-  failedResponse,
-  apiClient,
-  HTTP_STATUS_OK,
-  successResponse
-} = require('./axios');
+import { query, collection, getDocs } from 'firebase/firestore';
+import { db } from '../services/firebase.js';
+import { failedResponse, successResponse } from './axios.js';
 
-const getClanData = async () => {
+const fetchClans = async () => {
+  const q = query(collection(db, 'clans'));
+
   try {
-    const url = '/api/clans';
-    const response = await apiClient(url);
+    const querySnapshot = await getDocs(q);
+    const clans = [];
 
-    if (response?.status === HTTP_STATUS_OK) {
-      return successResponse({
-        data: response?.data?.data
-      });
-    } else {
-      return failedResponse();
-    }
+    querySnapshot.forEach((doc) => {
+      clans.push(doc.data());
+    });
+
+    return successResponse({ clans });
   } catch (error) {
-    console.log('Error: ', error);
+    console.log(error);
     return failedResponse();
   }
 };
 
-module.exports = { getClanData };
+export { fetchClans };

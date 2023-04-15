@@ -1,41 +1,36 @@
-const {
-  failedResponse,
-  apiClient,
-  HTTP_STATUS_OK,
-  successResponse
-} = require('./axios');
-
-const qs = require('qs');
-const moment = require('moment');
+import { db } from '../services/firebase.js';
+import { failedResponse, successResponse } from './axios.js';
+import {
+  Timestamp,
+  collection,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  where
+} from 'firebase/firestore';
 
 const getCvcData = async () => {
-  const query = qs.stringify(
-    {
-      filters: {
-        end_date: {
-          $gt: moment().toISOString()
-        }
-      }
-    },
-    {
-      encodeValuesOnly: true // prettify URL
-    }
+  const q = query(
+    collection(db, 'clan-vs-clans'),
+    where('endDate', '>=', Timestamp.now()),
+    orderBy('endDate'),
+    limit(1)
   );
-  try {
-    const url = `/api/clan-vs-clans?${query}`;
-    const response = await apiClient(url);
 
-    if (response?.status === HTTP_STATUS_OK) {
-      return successResponse({
-        data: response?.data?.data
-      });
-    } else {
-      return failedResponse();
-    }
+  try {
+    const querySnapshot = await getDocs(q);
+    const cvcs = [];
+
+    querySnapshot.forEach((doc) => {
+      cvcs.push(doc.data());
+    });
+
+    return successResponse({ cvcs });
   } catch (error) {
-    console.log('Error: ', error);
+    console.log(error);
     return failedResponse();
   }
 };
 
-module.exports = { getCvcData };
+export { getCvcData };
