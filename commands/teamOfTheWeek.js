@@ -1,31 +1,7 @@
 import axios from 'axios';
 import { SlashCommandBuilder } from 'discord.js';
-import { createTotwEntry, uploadImage } from '../api/teamOfTheWeek.js';
-
-function b64toBlob(dataURI) {
-  var byteString = atob(dataURI.split(',')[1]);
-  var ab = new ArrayBuffer(byteString.length);
-  var ia = new Uint8Array(ab);
-
-  for (var i = 0; i < byteString.length; i++) {
-    ia[i] = byteString.charCodeAt(i);
-  }
-  return new Blob([ab], { type: 'image/jpeg' });
-}
-
-function dungeonChoiceToString(choice) {
-  const choices = {
-    demon_lord: 'Demon Lord',
-    hydra: 'Hydra',
-    iron_twins: 'Iron Twins',
-    sand_devils_necrolopolis: 'Sand Devils Necropolis',
-    spider: 'Spider',
-    dragon: 'Dragon',
-    fire_knight: 'Fire Knight',
-    ice_golem: 'Ice Golem'
-  };
-  return choices[choice] ?? '';
-}
+import { createTotwEntry } from '../api/teamOfTheWeek.js';
+import { uploadImageFile } from '../api/imageUploader.js';
 
 export const data = new SlashCommandBuilder()
   .setName('totw')
@@ -41,14 +17,14 @@ export const data = new SlashCommandBuilder()
       .setName('dungeon')
       .setDescription('Select the dungeon')
       .addChoices(
-        { name: 'Demon Lord', value: 'demon_lord' },
+        { name: 'Demon Lord', value: 'Demon Lord' },
         { name: 'Hydra', value: 'Hydra' },
-        { name: 'Iron Twins', value: 'iron_twins' },
-        { name: 'Sand Devils Necropolis', value: 'sand_devils_necropolis' },
-        { name: 'Spider', value: 'spider' },
-        { name: 'Dragon', value: 'dragon' },
-        { name: 'Fire Knight', value: 'fire_knight' },
-        { name: 'Ice Golem', value: 'ice_golem' }
+        { name: 'Iron Twins', value: 'Iron Twins' },
+        { name: 'Sand Devils Necropolis', value: 'Sand Devils Necropolis' },
+        { name: 'Spider', value: 'Spider' },
+        { name: 'Dragon', value: 'Dragon' },
+        { name: 'Fire Knight', value: 'Fire Knight' },
+        { name: 'Ice Golem', value: 'Ice Golem' }
       )
       .setRequired(true)
   );
@@ -83,19 +59,12 @@ export async function execute(interaction) {
       'binary'
     ).toString('base64')}`;
 
-    const blob = b64toBlob(dataUrl);
-
-    const formData = new FormData();
-    formData.append('files', blob, image.name);
-
-    const uploadRes = await uploadImage(formData);
+    const uploadRes = await uploadImageFile(dataUrl, image.name);
 
     const data = {
-      data: {
-        dungeon,
-        screenshot: uploadRes?.image?.id,
-        user: interaction?.user?.username
-      }
+      dungeon,
+      screenshot: uploadRes?.data,
+      submittedBy: interaction?.user?.username
     };
 
     const res = await createTotwEntry(data);
@@ -114,12 +83,12 @@ export async function execute(interaction) {
           },
           {
             name: `Dungeon`,
-            value: dungeonChoiceToString(dungeon),
+            value: dungeon,
             inline: true
           }
         ],
         image: {
-          url: uploadRes?.image?.url
+          url: uploadRes?.data
         }
       };
       return await interaction.channel.send({
