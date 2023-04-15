@@ -1,40 +1,34 @@
 import {
-  failedResponse,
-  apiClient,
-  HTTP_STATUS_OK,
-  successResponse
-} from './axios.js';
-
-import qs from 'qs';
-import moment from 'moment';
+  Timestamp,
+  collection,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  where
+} from 'firebase/firestore';
+import { failedResponse, successResponse } from './axios.js';
+import { db } from '../services/firebase.js';
 
 const getFusionData = async () => {
-  const query = qs.stringify(
-    {
-      populate: '*',
-      filters: {
-        end_date: {
-          $gt: moment().toISOString()
-        }
-      }
-    },
-    {
-      encodeValuesOnly: true // prettify URL
-    }
+  const q = query(
+    collection(db, 'fusions'),
+    where('endDate', '>=', Timestamp.now()),
+    orderBy('endDate'),
+    limit(1)
   );
-  try {
-    const url = `/api/fusions?${query}`;
-    const response = await apiClient(url);
 
-    if (response?.status === HTTP_STATUS_OK) {
-      return successResponse({
-        data: response?.data?.data
-      });
-    } else {
-      return failedResponse();
-    }
+  try {
+    const querySnapshot = await getDocs(q);
+    const fusions = [];
+
+    querySnapshot.forEach((doc) => {
+      fusions.push(doc.data());
+    });
+
+    return successResponse({ fusions });
   } catch (error) {
-    console.log('Error: ', error);
+    console.log(error);
     return failedResponse();
   }
 };

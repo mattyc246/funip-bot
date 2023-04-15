@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
+import { SlashCommandBuilder } from 'discord.js';
 import { getFusionData } from '../api/fusion.js';
 import moment from 'moment';
 
@@ -17,6 +17,17 @@ const getAffinityColor = (affinity) => {
   }
 };
 
+const getFusionType = (type) => {
+  switch (type) {
+    case 'fragment':
+      return 'Fragment Collector';
+    case 'fragment_fusion':
+      return 'Fragment Fusion';
+    default:
+      return 'Classic';
+  }
+};
+
 export const data = new SlashCommandBuilder()
   .setName('fusion')
   .setDescription('Shows the current fusion details and fusion planner');
@@ -25,20 +36,24 @@ export async function execute(interaction) {
   const response = await getFusionData();
 
   if (response?.isSuccess) {
-    if (response?.data?.length === 0) {
+    if (response?.fusions?.length === 0) {
       return await interaction.reply('No current upcoming fusions.');
     }
 
-    const activeFusion = response?.data[0]?.attributes;
+    const activeFusion = response?.fusions[0];
 
-    const imageUrl = activeFusion?.fusion_planner?.data?.attributes?.url;
+    const imageUrl = activeFusion?.fusionPlanner;
 
-    const startDate = moment(activeFusion?.start_date).format('Do MMMM YYYY');
-    const endDate = moment(activeFusion?.end_date).format('Do MMMM YYYY');
+    const startDate = moment(activeFusion?.startDate?.toDate()).format(
+      'Do MMMM YYYY'
+    );
+    const endDate = moment(activeFusion?.endDate?.toDate()).format(
+      'Do MMMM YYYY'
+    );
 
     const embedObject = {
       color: getAffinityColor(activeFusion?.affinity),
-      title: activeFusion?.champion_name,
+      title: activeFusion?.championName,
       description: 'Current Raid Shadow Legends Champion Fusion',
       fields: [
         {
@@ -53,7 +68,7 @@ export async function execute(interaction) {
         },
         {
           name: `Fusion Type`,
-          value: activeFusion?.fusion_type
+          value: getFusionType(activeFusion?.fusionType)
         },
         {
           name: 'Faction',
@@ -62,7 +77,9 @@ export async function execute(interaction) {
         },
         {
           name: `Affinity`,
-          value: activeFusion?.affinity,
+          value:
+            activeFusion?.affinity?.charAt(0).toUpperCase() +
+            activeFusion?.affinity?.slice(1),
           inline: true
         }
       ],
