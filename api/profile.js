@@ -1,41 +1,48 @@
 import {
-  failedResponse,
-  apiClient,
-  HTTP_STATUS_OK,
-  successResponse
-} from './axios.js';
+  Timestamp,
+  collection,
+  doc,
+  getDocs,
+  query,
+  setDoc,
+  where
+} from 'firebase/firestore';
+import { failedResponse, successResponse } from './axios.js';
+import { db } from '../services/firebase.js';
 
 const createProfile = async (data) => {
   if (!data) return failedResponse();
   try {
-    const url = `/api/profiles`;
-    const response = await apiClient.post(url, data);
+    const docRef = doc(collection(db, 'optimizer-links'));
 
-    if (response?.status === HTTP_STATUS_OK) {
-      return successResponse();
-    } else {
-      return failedResponse();
-    }
-  } catch (error) {
-    return failedResponse({
-      error: error.response.data.error.name
+    await setDoc(docRef, {
+      id: docRef.id,
+      ...data,
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now()
     });
+
+    return successResponse({});
+  } catch (error) {
+    console.log(error);
+    return failedResponse();
   }
 };
 
 const getProfiles = async () => {
-  try {
-    const url = `/api/profiles`;
-    const response = await apiClient.get(url);
+  const q = query(collection(db, 'optimizer-links'));
 
-    if (response?.status === HTTP_STATUS_OK) {
-      return successResponse({
-        profiles: response?.data?.data
-      });
-    } else {
-      return failedResponse();
-    }
+  try {
+    const querySnapshot = await getDocs(q);
+    const links = [];
+
+    querySnapshot.forEach((doc) => {
+      links.push(doc.data());
+    });
+
+    return successResponse({ links });
   } catch (error) {
+    console.log(error);
     return failedResponse();
   }
 };

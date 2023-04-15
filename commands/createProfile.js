@@ -25,12 +25,10 @@ export async function execute(interaction) {
     const discordName = interaction.user.username;
 
     const data = {
-      data: {
-        discord_name: discordName,
-        raid_name: gameName,
-        link,
-        discord_id: discordId
-      }
+      discordName,
+      raidName: gameName,
+      link,
+      discordId
     };
 
     await interaction.deferReply({ ephemeral: true });
@@ -77,6 +75,7 @@ export async function execute(interaction) {
       'Unknown error occured while trying to create optimizer profile'
     );
   } catch (err) {
+    console.log(err);
     return await interaction.editReply('BOT ERROR!');
   }
 }

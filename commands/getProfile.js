@@ -20,51 +20,49 @@ export async function execute(interaction) {
     const response = await getProfiles();
 
     if (response?.isSuccess) {
-      if (response?.profiles?.length === 0) {
+      if (response?.links?.length === 0) {
         return await interaction.editReply('No links to search at this time.');
       }
 
-      const filteredProfiles = response?.profiles?.filter((profile) => {
+      const filteredLinks = response?.links?.filter((link) => {
         return (
-          profile?.attributes?.discord_name
+          link?.discordName
             ?.toLowerCase()
             ?.includes(searchName?.toLowerCase()) ||
-          profile?.attributes?.raid_name
-            ?.toLowerCase()
-            ?.includes(searchName?.toLowerCase())
+          link?.raidName?.toLowerCase()?.includes(searchName?.toLowerCase())
         );
       });
 
-      if (filteredProfiles?.length === 0) {
+      if (filteredLinks?.length === 0) {
         return await interaction.editReply(
           'No users found matching this username, please try again!'
         );
       }
 
-      await interaction.editReply(`${filteredProfiles?.length} users found!`);
+      await interaction.editReply(`${filteredLinks?.length} users found!`);
 
       const embeds = [];
 
-      filteredProfiles?.forEach((profile) => {
+      filteredLinks?.forEach((link) => {
         const embedObject = {
           color: 0xfcba03,
           title: `Optimizer Link`,
           description: 'Hell Hades Optimizer Shareable Link',
-          url: profile?.attributes?.link,
+          url: link?.link,
           fields: [
             {
               name: `Discord Name`,
-              value: profile?.attributes?.discord_name,
+              value: link?.discordName,
               inline: true
             },
             {
               name: `In Game Name`,
-              value: profile?.attributes?.raid_name,
+              value: link?.raidName,
               inline: true
             },
             {
               name: `Click to view`,
-              value: profile?.attributes?.link
+              value: link?.link
             }
           ]
         };
