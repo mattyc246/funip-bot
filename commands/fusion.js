@@ -4,13 +4,13 @@ import moment from 'moment';
 
 const getAffinityColor = (affinity) => {
   switch (affinity) {
-    case 'Void':
+    case 'void':
       return 0xcb3dc9;
-    case 'Spirit':
+    case 'spirit':
       return 0x52c548;
-    case 'Force':
+    case 'force':
       return 0xe54b3c;
-    case 'Magic':
+    case 'magic':
       return 0x59c0f9;
     default:
       return 0x000000;

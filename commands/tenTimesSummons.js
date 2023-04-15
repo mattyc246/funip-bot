@@ -10,27 +10,25 @@ export async function execute(interaction) {
   const response = await get10xData();
 
   if (response?.isSuccess) {
-    if (response?.data?.length === 0) {
+    if (response?.events?.length === 0) {
       return await interaction.reply(
         '**UPCOMING 10x EVENT**\n------------------\n Information not yet known'
       );
     }
 
-    const nextEvent = response?.data[0];
+    const nextEvent = response?.events[0];
 
-    const startDate = moment(nextEvent?.attributes?.start_date).format(
+    const startDate = moment(nextEvent?.startDate?.toDate()).format(
       'Do MMMM YYYY'
     );
-    const endDate = moment(nextEvent?.attributes?.end_date).format(
-      'Do MMMM YYYY'
-    );
+    const endDate = moment(nextEvent?.endDate?.toDate()).format('Do MMMM YYYY');
 
     await interaction.reply(`
           **UPCOMING 10x EVENT**\n------------------\nCHAMPIONS:\n${
-            nextEvent?.attributes?.champions
+            nextEvent?.champions
           }\n\n**From:** ${startDate} \n**Until:** ${endDate}${
-      nextEvent?.attributes?.additional_notes
-        ? `\n\n------------------\n**Additional Notes:**\n${nextEvent?.attributes?.additional_notes}`
+      nextEvent?.additionalNotes
+        ? `\n\n------------------\n**Additional Notes:**\n${nextEvent?.additionalNotes}`
         : ''
     }
         `);

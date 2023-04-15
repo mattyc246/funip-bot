@@ -1,42 +1,35 @@
+import { failedResponse, successResponse } from './axios.js';
 import {
-  failedResponse,
-  apiClient,
-  HTTP_STATUS_OK,
-  successResponse
-} from './axios.js';
-
-import qs from 'qs';
-import moment from 'moment';
+  Timestamp,
+  collection,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  where
+} from 'firebase/firestore';
+import { db } from '../services/firebase.js';
 
 const get10xData = async () => {
-  const query = qs.stringify(
-    {
-      filters: {
-        end_date: {
-          $gt: moment().toISOString()
-        },
-        active: {
-          $eq: true
-        }
-      }
-    },
-    {
-      encodeValuesOnly: true // prettify URL
-    }
+  const q = query(
+    collection(db, '10x-events'),
+    where('endDate', '>=', Timestamp.now()),
+    where('active', '==', true),
+    orderBy('endDate'),
+    limit(1)
   );
-  try {
-    const url = `/api/ten-times-events?${query}`;
-    const response = await apiClient(url);
 
-    if (response?.status === HTTP_STATUS_OK) {
-      return successResponse({
-        data: response?.data?.data
-      });
-    } else {
-      return failedResponse();
-    }
+  try {
+    const querySnapshot = await getDocs(q);
+    const events = [];
+
+    querySnapshot.forEach((doc) => {
+      events.push(doc.data());
+    });
+
+    return successResponse({ events });
   } catch (error) {
-    console.log('Error: ', error);
+    console.log(error);
     return failedResponse();
   }
 };
