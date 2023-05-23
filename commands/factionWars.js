@@ -1,5 +1,11 @@
 import axios from 'axios';
-import { SlashCommandBuilder } from 'discord.js';
+import {
+  ActionRowBuilder,
+  ModalBuilder,
+  SlashCommandBuilder,
+  TextInputBuilder,
+  TextInputStyle
+} from 'discord.js';
 import { uploadImageFile } from '../api/imageUploader.js';
 import { factions } from '../data/factionWarsData.js';
 
@@ -36,11 +42,15 @@ export const data = new SlashCommandBuilder()
         { name: 'Sylvan Watchers', value: '15' }
       )
       .setRequired(true)
+  )
+  .addStringOption((option) =>
+    option.setName('details').setDescription('Add details about your team comp')
   );
 
 export async function execute(interaction, client) {
   const image = interaction.options.getAttachment('image');
   const factionId = interaction.options.getString('faction');
+  const details = interaction.options.getString('details');
 
   if (!image) {
     return await interaction.reply({
@@ -96,6 +106,13 @@ export async function execute(interaction, client) {
         url: uploadRes?.data
       }
     };
+
+    if (details) {
+      embedObject.fields.push({
+        name: 'Details',
+        value: details
+      });
+    }
 
     await webhook.send({
       threadId: faction.threadId,
