@@ -52,6 +52,10 @@ const commands = [
   {
     name: '/get_optimizer',
     description: 'Search for a users optimizer profile'
+  },
+  {
+    name: '/faction_wars',
+    description: 'Upload your best Faction Wars Stage 21 team'
   }
 ];
 
