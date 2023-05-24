@@ -73,7 +73,7 @@ export async function execute(interaction, client) {
     const webhooks = await channel.fetchWebhooks();
     const webhook = webhooks.first();
 
-    const imageName = `${new Date().toISOString()}_${image.name}`;
+    const imageName = `${new Date().getTime()}_${image.name}`;
 
     const imageRes = await axios.get(image.url, {
       responseType: 'arraybuffer'
