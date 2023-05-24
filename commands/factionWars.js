@@ -73,6 +73,8 @@ export async function execute(interaction, client) {
     const webhooks = await channel.fetchWebhooks();
     const webhook = webhooks.first();
 
+    const imageName = `${new Date().toISOString()}_${image.name}`;
+
     const imageRes = await axios.get(image.url, {
       responseType: 'arraybuffer'
     });
@@ -82,7 +84,7 @@ export async function execute(interaction, client) {
       'binary'
     ).toString('base64')}`;
 
-    const uploadRes = await uploadImageFile(dataUrl, image.name);
+    const uploadRes = await uploadImageFile(dataUrl, imageName);
 
     const faction = factions.find((f) => f.id === Number(factionId));
 

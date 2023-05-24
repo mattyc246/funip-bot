@@ -50,6 +50,8 @@ export async function execute(interaction) {
   await interaction.deferReply({ ephemeral: true });
 
   try {
+    const imageName = `${new Date().toISOString()}_${image.name}`;
+
     const imageRes = await axios.get(image.url, {
       responseType: 'arraybuffer'
     });
@@ -59,7 +61,7 @@ export async function execute(interaction) {
       'binary'
     ).toString('base64')}`;
 
-    const uploadRes = await uploadImageFile(dataUrl, image.name);
+    const uploadRes = await uploadImageFile(dataUrl, imageName);
 
     const data = {
       dungeon,
