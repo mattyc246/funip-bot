@@ -1,9 +1,17 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { Client, Events, GatewayIntentBits, Collection } from 'discord.js';
+import {
+  Client,
+  Events,
+  GatewayIntentBits,
+  Collection,
+  codeBlock
+} from 'discord.js';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
+
+const LOG_CHANNEL_ID = '1123908665930428446';
 
 // Create a new client instance
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
@@ -32,6 +40,10 @@ for (const file of commandFiles) {
 client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
+  const channel = await client.channels.fetch(LOG_CHANNEL_ID);
+  const webhooks = await channel.fetchWebhooks();
+  const webhook = webhooks.first();
+
   const command = interaction.client.commands.get(interaction.commandName);
 
   if (!command) {
@@ -41,11 +53,65 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
   try {
     await command.execute(interaction, client);
+    webhook.send({
+      embeds: [
+        {
+          color: 0x42f578,
+          title: 'Command Log',
+          fields: [
+            {
+              name: `Time`,
+              value: `<t:${Math.floor(new Date().getTime() / 1000)}>`,
+              inline: true
+            },
+            {
+              name: `User`,
+              value: interaction?.user?.username,
+              inline: true
+            },
+            {
+              name: `Command`,
+              value: interaction.commandName,
+              inline: true
+            }
+          ]
+        }
+      ]
+    });
   } catch (error) {
     console.error(error);
     await interaction.reply({
       content: 'There was an error while executing this command!',
       ephemeral: true
+    });
+    webhook.send({
+      embeds: [
+        {
+          color: 0xf54542,
+          title: 'Error Log',
+          fields: [
+            {
+              name: `Time`,
+              value: `<t:${Math.floor(new Date().getTime() / 1000)}>`,
+              inline: true
+            },
+            {
+              name: `User`,
+              value: interaction?.user?.username,
+              inline: true
+            },
+            {
+              name: `Command`,
+              value: interaction.commandName,
+              inline: true
+            },
+            {
+              name: 'Error',
+              value: codeBlock(error.stack)
+            }
+          ]
+        }
+      ]
     });
   }
 });

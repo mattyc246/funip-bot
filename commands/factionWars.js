@@ -1,11 +1,5 @@
 import axios from 'axios';
-import {
-  ActionRowBuilder,
-  ModalBuilder,
-  SlashCommandBuilder,
-  TextInputBuilder,
-  TextInputStyle
-} from 'discord.js';
+import { SlashCommandBuilder } from 'discord.js';
 import { uploadImageFile } from '../api/imageUploader.js';
 import { factions } from '../data/factionWarsData.js';
 
