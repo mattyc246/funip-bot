@@ -45,7 +45,8 @@ export async function execute(interaction) {
     ).toFixed(2);
   }
 
-  await interaction.reply(
-    `**CALCULATED RESIST CHANCE**\n---------------------\n**Champion Accuracy:** ${parsedAcc}\n**Enemy Resistance:** ${parsedRes}\nChance the enemy will resist your debuff is:\n**${debuffChance}%**`
-  );
+  await interaction.reply({
+    content: `**CALCULATED RESIST CHANCE**\n---------------------\n**Champion Accuracy:** ${parsedAcc}\n**Enemy Resistance:** ${parsedRes}\nChance the enemy will resist your debuff is:\n**${debuffChance}%**`,
+    ephemeral: true
+  });
 }

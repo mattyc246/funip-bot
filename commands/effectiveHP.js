@@ -31,7 +31,8 @@ export async function execute(interaction) {
     parsedHp / (1 - 0.85 * (1 - Math.E ** ((-2 * parsedDef) / 3000)))
   );
 
-  await interaction.reply(
-    `**CALCULATED EHP**\n---------------------\n**Champion HP:** ${parsedHp}\n**Champion DEF:** ${parsedDef}\nYour effective HP is:\n**${calculatedEHP}**`
-  );
+  await interaction.reply({
+    content: `**CALCULATED EHP**\n---------------------\n**Champion HP:** ${parsedHp}\n**Champion DEF:** ${parsedDef}\nYour effective HP is:\n**${calculatedEHP}**`,
+    ephemeral: true
+  });
 }
