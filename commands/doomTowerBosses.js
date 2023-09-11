@@ -78,7 +78,6 @@ export async function execute(interaction, client) {
     const embedObject = {
       color: boss.color,
       title: `${boss.bossName}!`,
-      description: 'Best Run!',
       fields: [
         {
           name: `User`,
