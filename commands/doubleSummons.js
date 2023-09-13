@@ -10,6 +10,8 @@ const getEmojiId = (type) => {
       return '1078894411066388532';
     case 'sacred':
       return '1078894406893043762';
+    case 'primal':
+      return '1151547743240720524';
   }
 };
 
