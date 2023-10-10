@@ -4,8 +4,7 @@ import {
   doc,
   getDocs,
   query,
-  setDoc,
-  where
+  setDoc
 } from 'firebase/firestore';
 import { failedResponse, successResponse } from './axios.js';
 import { db } from '../services/firebase.js';
