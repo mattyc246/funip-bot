@@ -17,7 +17,7 @@ export async function execute(interaction) {
       {
         name: 'Click to view',
         value:
-          'https://docs.google.com/spreadsheets/d/1aBVkLPr9sfAo2v9JalhxyPu20ogdjUsPBEVEtvYNVDQ'
+          'https://docs.google.com/spreadsheets/d/1I1F4HhRbu21zBHIq0VBW-zysvHeYT5Fotf4VnQthw0c/edit'
       }
     ],
     thumbnail: {
