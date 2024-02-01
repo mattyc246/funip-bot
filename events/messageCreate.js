@@ -23,13 +23,13 @@ export default {
   async execute(message) {
     if (message.author.bot || message.author.system) return;
 
-    if (message.content.toLowerCase().includes('kymar')) {
-      await message.reply({
-        content: `Kymar is a bad champion. Please do not use him. Muffin said so. ${formatEmoji(
-          '1083773019983454318'
-        )}`
-      });
-    }
+    // if (message.content.toLowerCase().includes('kymar')) {
+    //   await message.reply({
+    //     content: `Kymar is a bad champion. Please do not use him. Muffin said so. ${formatEmoji(
+    //       '1083773019983454318'
+    //     )}`
+    //   });
+    // }
 
     if (message.channelId === BUILD_HELP_CHANNEL_ID) {
       const response = await getUserReminder(message.author.id);
