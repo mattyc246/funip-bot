@@ -70,7 +70,6 @@ export async function execute(interaction) {
   let trueSpeed = parsedActualSpeed;
 
   if (parsedAuraSpeed) {
-    console.log('parsedAuraSpeed', parsedAuraSpeed);
     if (parsedBlessingSpeed) {
       parsedAuraSpeed += parsedAuraSpeed * (parsedBlessingSpeed / 100);
     }
@@ -81,7 +80,13 @@ export async function execute(interaction) {
   }
 
   await interaction.reply({
-    content: `**CALCULATED SPEED**\n---------------------\n**Champion Base Speed:** ${parsedBaseSpeed}\n**Champion Actual Speed:** ${parsedActualSpeed}\n**Aura Speed Bonus:** ${parsedAuraSpeed}%\n**Blessing Bonus Speed:** ${parsedBlessingSpeed}%\n**Rival Blessing Deduction:** ${parsedRivalBlessingSpeed}%\n\nYour true speed is:\n**${trueSpeed}**`,
+    content: `**CALCULATED SPEED**\n---------------------\n**Champion Base Speed:** ${parsedBaseSpeed}\n**Champion Actual Speed:** ${parsedActualSpeed}\n**Aura Bonus:** ${
+      auraSpeed || 0
+    }%\n**Blessing Bonus:** ${
+      blessingSpeed || 0
+    }%\n**Rival Blessing Reduction:** ${
+      rivalBlessingSpeed || 0
+    }%\n**Final Aura:** ${parsedAuraSpeed}%\n\nYour true speed is:\n**${trueSpeed}**`,
     ephemeral: true
   });
 }
